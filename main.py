@@ -1,9 +1,12 @@
+import csv
+from datetime import datetime
+from time import sleep
+
 from selenium.webdriver import Chrome, ChromeOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
-from time import sleep
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 
@@ -14,15 +17,38 @@ class ProfileEngineeringCrawler():
         self.chrome_options = ChromeOptions()
         self.chrome_options.add_argument("--no-sandbox")
         self.chrome_options.add_argument("--disable-dev-shm-usage")
-
+        # Make sure the current chrome binary & chromedriver have the same version
+        self.chrome_options.binary_location = "/opt/google/chrome/chrome" # Disable at the moment, enable it when getting error DevToolActive not found
         # Path to your Chrome WebDriver executable
-        self.chrome_driver_path = "xxxxxx" #### Place to your chromedriver on your machine
+        self.chrome_driver_path = "/home/tranvinhliem/chromedriver" #### Place to your chromedriver on your machine
 
         # Initialize Chrome WebDriver
         self.driver = Chrome(self.chrome_driver_path, options=self.chrome_options)
 
     def close_driver(self):
         self.driver.quit()
+
+    def CSVExport(self, data):
+        current_date = datetime.now().strftime("%Y-%m-%d")
+        csv_file = f"crawling_{current_date}.csv"
+
+        # Extract headers from the first section
+        headers = data[list(data.keys())[0]]['headers']
+
+        # Writing data to CSV
+        with open(csv_file, mode='w', newline='') as file:
+            writer = csv.writer(file)
+
+            # Write headers
+            writer.writerow(headers)
+
+            # Write records for each section
+            for section_key, section_value in data.items():
+                for record in section_value['records']:
+                    for record_value in record.values():
+                        writer.writerow(record_value)
+
+        print(f"CSV file '{csv_file}' has been written successfully.")
 
     def main(self):
         url = "https://americansocietyforengineeringeducation.shinyapps.io/profiles/"
@@ -118,6 +144,7 @@ class ProfileEngineeringCrawler():
                     tmpCol.append(col.text)
                 record[bodyRows.index(re)] = tmpCol
             records.append(record)
+            print(f"Got {len(record)} record/records in total")
             self._endResults[institutions_list[i]] = {'headers': headers, 'records': records}
 
             dummy_ele.click()
@@ -131,6 +158,7 @@ class ProfileEngineeringCrawler():
             ActionChains(self.driver).send_keys(Keys.ENTER).perform()
             sleep(3)
             print("--------------------------\n")
+        self.CSVExport(self._endResults)
 
 
 if __name__ == '__main__':
