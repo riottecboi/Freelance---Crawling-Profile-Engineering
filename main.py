@@ -18,9 +18,9 @@ class ProfileEngineeringCrawler():
         self.chrome_options.add_argument("--no-sandbox")
         self.chrome_options.add_argument("--disable-dev-shm-usage")
         # Make sure the current chrome binary & chromedriver have the same version
-        self.chrome_options.binary_location = "/opt/google/chrome/chrome" # Disable at the moment, enable it when getting error DevToolActive not found
+        self.chrome_options.binary_location = "xxxxxx" # Disable at the moment, enable it when getting error DevToolActive not found
         # Path to your Chrome WebDriver executable
-        self.chrome_driver_path = "/home/tranvinhliem/chromedriver" #### Place to your chromedriver on your machine
+        self.chrome_driver_path = "xxxxxxx" #### Place to your chromedriver on your machine
 
         # Initialize Chrome WebDriver
         self.driver = Chrome(self.chrome_driver_path, options=self.chrome_options)
